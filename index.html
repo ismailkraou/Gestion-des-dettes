@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2563eb" />
+    <title>Gestionnaire de Dettes</title>
+    <link rel="manifest" href="manifest.json" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: #f3f4f6;
+        color: #1f2937;
+        padding-bottom: 80px;
+      }
+
+      /* Header */
+      .header {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-content {
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .currency-selector {
+        display: flex;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem;
+        border-radius: 8px;
+      }
+
+      .currency-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+      }
+
+      .currency-btn.active {
+        background: white;
+        color: #2563eb;
+      }
+
+      /* Container */
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+
+      /* Total général */
+      .total-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      .total-card h2 {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .total-amount {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #2563eb;
+      }
+
+      /* Boutons d'action */
+      .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .btn {
+        background: white;
+        border: 2px solid #e5e7eb;
+        padding: 1rem;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .btn:active {
+        transform: scale(0.98);
+      }
+
+      .btn-primary {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+      }
+
+      .btn-secondary {
+        background: #10b981;
+        color: white;
+        border-color: #10b981;
+      }
+
+      /* Liste des personnes */
+      .person-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .person-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .person-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f3f4f6;
+      }
+
+      .person-name {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937;
+      }
+
+      .person-total {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2563eb;
+      }
+
+      .debt-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .debt-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f9fafb;
+        border-radius: 8px;
+      }
+
+      .debt-amount {
+        font-weight: 600;
+        color: #374151;
+      }
+
+      .debt-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .icon-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0.25rem;
+        font-size: 1.25rem;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+      }
+
+      .icon-btn:hover {
+        opacity: 1;
+      }
+
+      .person-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+      }
+
+      .small-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .small-btn.danger {
+        color: #ef4444;
+        border-color: #fecaca;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        max-width: 400px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        color: #1f2937;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #2563eb;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+      }
+
+      .modal-actions .btn {
+        flex: 1;
+        padding: 0.75rem;
+      }
+
+      /* Message vide */
+      .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6b7280;
+      }
+
+      .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+      }
+
+      /* Menu */
+      .menu-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+      }
+
+      .menu {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 300;
+      }
+
+      .menu.active {
+        display: block;
+      }
+
+      .menu-content {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 280px;
+        background: white;
+        padding: 1.5rem;
+        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .menu-header {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        color: #1f2937;
+      }
+
+      .menu-item {
+        padding: 1rem;
+        border-bottom: 1px solid #f3f4f6;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #374151;
+        font-weight: 500;
+      }
+
+      .menu-item:hover {
+        background: #f9fafb;
+      }
+
+      /* Auth */
+      .auth-screen {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        z-index: 400;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      .auth-screen.active {
+        display: flex;
+      }
+
+      .auth-box {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        max-width: 400px;
+        width: 100%;
+      }
+
+      .auth-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: #1f2937;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Écran d'authentification -->
+    <div class="auth-screen" id="authScreen">
+      <div class="auth-box">
+        <h2 class="auth-title" id="authTitle">Bienvenue</h2>
+        <form id="authForm">
+          <div class="form-group">
+            <label class="form-label" for="passwordInput">Mot de passe</label>
+            <input
+              type="password"
+              id="passwordInput"
+              class="form-input"
+              placeholder="Entrez votre mot de passe"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%">
+            Déverrouiller
+          </button>
+        </form>
+        <p
+          id="authMessage"
+          style="
+            color: #ef4444;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+          "
+        ></p>
+      </div>
+    </div>
+
+    <!-- Application principale -->
+    <div class="header">
+      <div class="header-content">
+        <h1>💰 Mes Dettes</h1>
+        <div style="display: flex; align-items: center; gap: 1rem">
+          <div class="currency-selector">
+            <button class="currency-btn active" data-currency="DH">DH</button>
+            <button class="currency-btn" data-currency="$">$</button>
+            <button class="currency-btn" data-currency="€">€</button>
+          </div>
+          <button class="menu-btn" id="menuBtn">☰</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="total-card">
+        <h2>Total Général</h2>
+        <div class="total-amount" id="totalAmount">0 DH</div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="addPersonBtn">
+          ➕ Ajouter une personne
+        </button>
+        <button class="btn btn-secondary" id="addDebtBtn">
+          💵 Ajouter une dette
+        </button>
+      </div>
+
+      <div class="person-list" id="personList">
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <p>Aucune dette enregistrée</p>
+          <p style="font-size: 0.875rem; margin-top: 0.5rem">
+            Commencez par ajouter une personne
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menu latéral -->
+    <div class="menu" id="menu">
+      <div class="menu-content">
+        <div class="menu-header">Menu</div>
+        <div class="menu-item" id="exportBtn">📤 Exporter les données</div>
+        <div class="menu-item" id="importBtn">📥 Importer les données</div>
+        <div class="menu-item" id="changePasswordBtn">
+          🔐 Changer le mot de passe
+        </div>
+        <div class="menu-item" id="clearDataBtn" style="color: #ef4444">
+          🗑️ Effacer toutes les données
+        </div>
+      </div>
+    </div>
+    <input type="file" id="importFile" accept=".json" style="display: none" />
+
+    <!-- Modal Ajouter une personne -->
+    <div class="modal" id="addPersonModal">
+      <div class="modal-content">
+        <div class="modal-header">Ajouter une personne</div>
+        <form id="addPersonForm">
+          <div class="form-group">
+            <label class="form-label" for="personName"
+              >Nom de la personne</label
+            >
+            <input
+              type="text"
+              id="personName"
+              class="form-input"
+              placeholder="Ex: Ahmed"
+              required
+            />
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn" id="cancelPersonBtn">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Ajouter une dette -->
+    <div class="modal" id="addDebtModal">
+      <div class="modal-content">
+        <div class="modal-header">Ajouter une dette</div>
+        <form id="addDebtForm">
+          <div class="form-group">
+            <label class="form-label" for="debtPerson">Personne</label>
+            <select id="debtPerson" class="form-input" required>
+              <option value="">Sélectionnez une personne</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="debtAmount">Montant (DH)</label>
+            <input
+              type="number"
+              id="debtAmount"
+              class="form-input"
+              placeholder="Ex: 500"
+              step="0.01"
+              required
+            />
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn" id="cancelDebtBtn">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Changer mot de passe -->
+    <div class="modal" id="changePasswordModal">
+      <div class="modal-content">
+        <div class="modal-header">Changer le mot de passe</div>
+        <form id="changePasswordForm">
+          <div class="form-group">
+            <label class="form-label" for="currentPassword"
+              >Mot de passe actuel</label
+            >
+            <input
+              type="password"
+              id="currentPassword"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newPassword"
+              >Nouveau mot de passe</label
+            >
+            <input
+              type="password"
+              id="newPassword"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="confirmPassword"
+              >Confirmer le mot de passe</label
+            >
+            <input
+              type="password"
+              id="confirmPassword"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn" id="cancelPasswordBtn">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary">Changer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // ========== GESTION DES DONNÉES ==========
+
+      let data = {
+        persons: [], // {id, name, debts: [{id, amount}]}
+        currency: "DH",
+      };
+
+      // Conversion des devises
+      const RATES = {
+        DH: 1,
+        $: 10,
+        "€": 10,
+      };
+
+      // Charger les données depuis localStorage
+      function loadData() {
+        const saved = localStorage.getItem("debtData");
+        if (saved) {
+          data = JSON.parse(saved);
+        }
+      }
+
+      // Sauvegarder les données dans localStorage
+      function saveData() {
+        localStorage.setItem("debtData", JSON.stringify(data));
+      }
+
+      // ========== GESTION DE L'AUTHENTIFICATION ==========
+
+      const authScreen = document.getElementById("authScreen");
+      const authForm = document.getElementById("authForm");
+      const passwordInput = document.getElementById("passwordInput");
+      const authMessage = document.getElementById("authMessage");
+      const authTitle = document.getElementById("authTitle");
+
+      // Vérifier si un mot de passe est défini
+      function hasPassword() {
+        return localStorage.getItem("appPassword") !== null;
+      }
+
+      // Initialiser l'authentification
+      function initAuth() {
+        if (!hasPassword()) {
+          authTitle.textContent = "Créer un mot de passe";
+          authScreen.classList.add("active");
+        } else {
+          authTitle.textContent = "Déverrouiller";
+          authScreen.classList.add("active");
+        }
+      }
+
+      // Soumettre le formulaire d'authentification
+      authForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const password = passwordInput.value;
+
+        if (!hasPassword()) {
+          // Créer un nouveau mot de passe
+          localStorage.setItem("appPassword", password);
+          authScreen.classList.remove("active");
+          loadData();
+          render();
+        } else {
+          // Vérifier le mot de passe
+          if (localStorage.getItem("appPassword") === password) {
+            authScreen.classList.remove("active");
+            loadData();
+            render();
+          } else {
+            authMessage.textContent = "Mot de passe incorrect";
+            authMessage.style.display = "block";
+            passwordInput.value = "";
+          }
+        }
+      });
+
+      // ========== GESTION DE LA DEVISE ==========
+
+      const currencyBtns = document.querySelectorAll(".currency-btn");
+
+      currencyBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          currencyBtns.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          data.currency = btn.dataset.currency;
+          saveData();
+          render();
+        });
+      });
+
+      // Convertir un montant vers la devise active
+      function convertAmount(amountDH) {
+        return amountDH / RATES[data.currency];
+      }
+
+      // Formater un montant avec la devise
+      function formatAmount(amountDH) {
+        const converted = convertAmount(amountDH);
+        return `${converted.toFixed(2)} ${data.currency}`;
+      }
+
+      // ========== GESTION DES PERSONNES ==========
+
+      const addPersonBtn = document.getElementById("addPersonBtn");
+      const addPersonModal = document.getElementById("addPersonModal");
+      const addPersonForm = document.getElementById("addPersonForm");
+      const cancelPersonBtn = document.getElementById("cancelPersonBtn");
+
+      addPersonBtn.addEventListener("click", () => {
+        addPersonModal.classList.add("active");
+      });
+
+      cancelPersonBtn.addEventListener("click", () => {
+        addPersonModal.classList.remove("active");
+        addPersonForm.reset();
+      });
+
+      addPersonForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("personName").value;
+
+        const newPerson = {
+          id: Date.now(),
+          name: name,
+          debts: [],
+        };
+
+        data.persons.push(newPerson);
+        saveData();
+        render();
+        addPersonModal.classList.remove("active");
+        addPersonForm.reset();
+      });
+
+      // Supprimer une personne
+      function deletePerson(personId) {
+        if (
+          confirm(
+            "Êtes-vous sûr de vouloir supprimer cette personne et toutes ses dettes ?"
+          )
+        ) {
+          data.persons = data.persons.filter((p) => p.id !== personId);
+          saveData();
+          render();
+        }
+      }
+
+      // ========== GESTION DES DETTES ==========
+
+      const addDebtBtn = document.getElementById("addDebtBtn");
+      const addDebtModal = document.getElementById("addDebtModal");
+      const addDebtForm = document.getElementById("addDebtForm");
+      const cancelDebtBtn = document.getElementById("cancelDebtBtn");
+
+      addDebtBtn.addEventListener("click", () => {
+        if (data.persons.length === 0) {
+          alert("Veuillez d'abord ajouter une personne");
+          return;
+        }
+        updatePersonSelect();
+        addDebtModal.classList.add("active");
+      });
+
+      cancelDebtBtn.addEventListener("click", () => {
+        addDebtModal.classList.remove("active");
+        addDebtForm.reset();
+      });
+
+      addDebtForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const personId = parseInt(document.getElementById("debtPerson").value);
+        const amount = parseFloat(document.getElementById("debtAmount").value);
+
+        const person = data.persons.find((p) => p.id === personId);
+        if (person) {
+          person.debts.push({
+            id: Date.now(),
+            amount: amount,
+          });
+          saveData();
+          render();
+          addDebtModal.classList.remove("active");
+          addDebtForm.reset();
+        }
+      });
+
+      // Mettre à jour la liste des personnes dans le select
+      function updatePersonSelect() {
+        const select = document.getElementById("debtPerson");
+        select.innerHTML =
+          '<option value="">Sélectionnez une personne</option>';
+        data.persons.forEach((person) => {
+          const option = document.createElement("option");
+          option.value = person.id;
+          option.textContent = person.name;
+          select.appendChild(option);
+        });
+      }
+
+      // Supprimer une dette
+      function deleteDebt(personId, debtId) {
+        const person = data.persons.find((p) => p.id === personId);
+        if (person) {
+          person.debts = person.debts.filter((d) => d.id !== debtId);
+          saveData();
+          render();
+        }
+      }
+
+      // Ajouter une dette rapide à une personne
+      function addQuickDebt(personId) {
+        const amount = prompt("Montant de la dette (DH):");
+        if (amount && !isNaN(amount) && parseFloat(amount) > 0) {
+          const person = data.persons.find((p) => p.id === personId);
+          if (person) {
+            person.debts.push({
+              id: Date.now(),
+              amount: parseFloat(amount),
+            });
+            saveData();
+            render();
+          }
+        }
+      }
+
+      // ========== MENU ==========
+
+      const menuBtn = document.getElementById("menuBtn");
+      const menu = document.getElementById("menu");
+      const exportBtn = document.getElementById("exportBtn");
+      const importBtn = document.getElementById("importBtn");
+      const importFile = document.getElementById("importFile");
+      const changePasswordBtn = document.getElementById("changePasswordBtn");
+      const clearDataBtn = document.getElementById("clearDataBtn");
+
+      menuBtn.addEventListener("click", () => {
+        menu.classList.add("active");
+      });
+
+      menu.addEventListener("click", (e) => {
+        if (e.target === menu) {
+          menu.classList.remove("active");
+        }
+      });
+
+      // Exporter les données
+      exportBtn.addEventListener("click", () => {
+        const dataStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `dettes_${new Date().toISOString().split("T")[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        menu.classList.remove("active");
+      });
+
+      // Importer les données
+      importBtn.addEventListener("click", () => {
+        importFile.click();
+      });
+
+      importFile.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            try {
+              const imported = JSON.parse(e.target.result);
+              if (
+                confirm(
+                  "Êtes-vous sûr de vouloir importer ces données ? Les données actuelles seront remplacées."
+                )
+              ) {
+                data = imported;
+                saveData();
+                render();
+              }
+            } catch (error) {
+              alert("Erreur lors de l'import du fichier");
+            }
+          };
+          reader.readAsText(file);
+        }
+        menu.classList.remove("active");
+        importFile.value = "";
+      });
+
+      // Effacer toutes les données
+      clearDataBtn.addEventListener("click", () => {
+        if (
+          confirm(
+            "Êtes-vous sûr de vouloir effacer toutes les données ? Cette action est irréversible."
+          )
+        ) {
+          data = { persons: [], currency: "DH" };
+          saveData();
+          render();
+          menu.classList.remove("active");
+        }
+      });
+
+      // Changer le mot de passe
+      const changePasswordModal = document.getElementById(
+        "changePasswordModal"
+      );
+      const changePasswordForm = document.getElementById("changePasswordForm");
+      const cancelPasswordBtn = document.getElementById("cancelPasswordBtn");
+
+      changePasswordBtn.addEventListener("click", () => {
+        menu.classList.remove("active");
+        changePasswordModal.classList.add("active");
+      });
+
+      cancelPasswordBtn.addEventListener("click", () => {
+        changePasswordModal.classList.remove("active");
+        changePasswordForm.reset();
+      });
+
+      changePasswordForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const current = document.getElementById("currentPassword").value;
+        const newPass = document.getElementById("newPassword").value;
+        const confirm = document.getElementById("confirmPassword").value;
+
+        if (localStorage.getItem("appPassword") !== current) {
+          alert("Mot de passe actuel incorrect");
+          return;
+        }
+
+        if (newPass !== confirm) {
+          alert("Les mots de passe ne correspondent pas");
+          return;
+        }
+
+        localStorage.setItem("appPassword", newPass);
+        alert("Mot de passe changé avec succès");
+        changePasswordModal.classList.remove("active");
+        changePasswordForm.reset();
+      });
+
+      // ========== RENDU DE L'INTERFACE ==========
+
+      function render() {
+        // Mettre à jour la devise active
+        currencyBtns.forEach((btn) => {
+          btn.classList.toggle(
+            "active",
+            btn.dataset.currency === data.currency
+          );
+        });
+
+        // Calculer le total général
+        let totalGeneral = 0;
+        data.persons.forEach((person) => {
+          person.debts.forEach((debt) => {
+            totalGeneral += debt.amount;
+          });
+        });
+
+        document.getElementById("totalAmount").textContent =
+          formatAmount(totalGeneral);
+
+        // Rendre la liste des personnes
+        const personList = document.getElementById("personList");
+
+        if (data.persons.length === 0) {
+          personList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>Aucune dette enregistrée</p>
+                        <p style="font-size: 0.875rem; margin-top: 0.5rem;">Commencez par ajouter une personne</p>
+                    </div>
+                `;
+        } else {
+          personList.innerHTML = "";
+          data.persons.forEach((person) => {
+            const totalPerson = person.debts.reduce(
+              (sum, debt) => sum + debt.amount,
+              0
+            );
+
+            const card = document.createElement("div");
+            card.className = "person-card";
+
+            const debtsHTML = person.debts
+              .map(
+                (debt) => `
+                        <div class="debt-item">
+                            <span class="debt-amount">${formatAmount(
+                              debt.amount
+                            )}</span>
+                            <div class="debt-actions">
+                                <button class="icon-btn" onclick="deleteDebt(${
+                                  person.id
+                                }, ${debt.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `
+              )
+              .join("");
+
+            const calculation =
+              person.debts.length > 0
+                ? `<p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem;">${person.debts
+                    .map((d) => formatAmount(d.amount))
+                    .join(" + ")} = ${formatAmount(totalPerson)}</p>`
+                : "";
+
+            card.innerHTML = `
+                        <div class="person-header">
+                            <span class="person-name">${person.name}</span>
+                            <span class="person-total">${formatAmount(
+                              totalPerson
+                            )}</span>
+                        </div>
+                        ${calculation}
+                        ${
+                          person.debts.length > 0
+                            ? `
+                            <div class="debt-list">
+                                ${debtsHTML}
+                            </div>
+                        `
+                            : ""
+                        }
+                        <div class="person-actions">
+                            <button class="small-btn" onclick="addQuickDebt(${
+                              person.id
+                            })">➕ Ajouter une dette</button>
+                            <button class="small-btn danger" onclick="deletePerson(${
+                              person.id
+                            })">Supprimer</button>
+                        </div>
+                    `;
+
+            personList.appendChild(card);
+          });
+        }
+      }
+
+      // ========== SERVICE WORKER POUR PWA ==========
+
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("sw.js")
+            .then((reg) => console.log("Service Worker enregistré"))
+            .catch((err) => console.log("Erreur Service Worker:", err));
+        });
+      }
+
+      // ========== INITIALISATION ==========
+
+      initAuth();
+    </script>
+  </body>
+</html>
