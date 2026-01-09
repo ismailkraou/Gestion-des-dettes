@@ -42,7 +42,7 @@ Une application web progressive (PWA) simple et élégante pour gérer vos dette
 
 1. **Visitez l'application** sur votre téléphone :
    ```
-   [https://votre-username.github.io/votre-repo/](https://ismailkraou.github.io/Gestion-des-dettes/)
+   https://ismailkraou.github.io/Gestion-des-dettes/
    ```
 
 2. **Installer sur Android** :
@@ -60,7 +60,7 @@ Une application web progressive (PWA) simple et élégante pour gérer vos dette
 
 1. **Clonez le repository** :
    ```bash
-   git clone [https://github.com/votre-username/votre-repo.git](https://github.com/ismailkraou/Gestion-des-dettes)
+   git clone https://github.com/ismailkraou/Gestion-des-dettes
    cd votre-repo
    ```
 
@@ -185,7 +185,7 @@ Les contributions sont les bienvenues ! Voici comment vous pouvez aider :
 Si vous rencontrez un problème :
 
 1. Vérifiez que vous utilisez la **dernière version**
-2. Consultez les [Issues existantes]([https://github.com/votre-username/votre-repo/issues](https://github.com/ismailkraou/Gestion-des-dettes/issues))
+2. Consultez les [Issues existantes](https://github.com/ismailkraou/Gestion-des-dettes/issues)
 3. Créez une nouvelle issue avec :
    - Description du problème
    - Étapes pour reproduire
@@ -232,8 +232,8 @@ Créé avec ❤️ pour gérer les dettes personnelles de manière simple et pri
 
 ## 📞 Support
 
-- 🐛 **Bugs** : [Ouvrir une issue]([https://github.com/votre-username/votre-repo/issues](https://github.com/ismailkraou/Gestion-des-dettes/issues))
-- 💡 **Suggestions** : [Discussions]([https://github.com/votre-username/votre-repo/discussions](https://github.com/ismailkraou/Gestion-des-dettes/discussions))
+- 🐛 **Bugs** : [Ouvrir une issue](https://github.com/ismailkraou/Gestion-des-dettes/issues)
+- 💡 **Suggestions** : [Discussions](https://github.com/ismailkraou/Gestion-des-dettes/discussions)
 - 📧 **Contact** : ismail.kraou@gmail.com
 
 ---
